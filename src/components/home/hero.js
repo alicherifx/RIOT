@@ -1,6 +1,4 @@
 import React from 'react';
-import { Button } from 'antd';
-
 import { Carousel } from 'antd';
 
 const items = [

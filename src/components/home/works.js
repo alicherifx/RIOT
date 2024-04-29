@@ -5,7 +5,7 @@ class AppWorks extends React.Component {
     return (
       <div id="works" className="block worksBlock">
         <div className="container-fluid">
-
+          <h2>HI</h2>
         </div>
       </div>
     );
