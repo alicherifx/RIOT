@@ -382,19 +382,37 @@ Robot
 */
 .video-and-controls {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center; 
-  height: 600px;
+  height: 100%;
 }
 
 .video-container {
-  width: 60%; 
+  width: 100%;
+  margin-bottom: 20px; /* Added margin between video and controls */
 }
 
 .control-buttons {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
+}
+
+/* Media query for small screens */
+@media screen and (max-width: 768px) {
+  .video-and-controls {
+    align-items: stretch;
+  }
+
+  .video-container {
+    width: 100%;
+    margin-bottom: 0; 
+  }
+
+  .control-buttons {
+    width: 100%;
+  }
 }
 
 
@@ -424,3 +442,4 @@ responsive
     display: none;
   }
 }
+
