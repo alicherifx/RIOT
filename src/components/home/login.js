@@ -60,7 +60,7 @@ function AppLogin({ loggedIn, onLogin }) {
 
   useEffect(() => {
     if (loggedIn && !client) {
-      const mqttClient = mqtt.connect('wss://test.mosquitto.org:8081');
+      const mqttClient = mqtt.connect('wss://test.mosquitto.org:8081'); 
       mqttClient.on('connect', () => {
         console.log('Connected to MQTT broker');
         mqttClient.subscribe('robot/forward', (err) => {
@@ -70,7 +70,7 @@ function AppLogin({ loggedIn, onLogin }) {
         });
       });
       mqttClient.on('message', (topic, payload) => {
-        if (topic === 'PFEJAMEL') {
+        if (topic === 'robot/forward') {
           setMessage(payload.toString());
         }
       });
@@ -190,7 +190,7 @@ function AppLogin({ loggedIn, onLogin }) {
               <video autoPlay playsInline style={{ width: '100%', height: '100%' }} ref={videoRef} />
             </div>
             <div style={{ marginTop: '16px', textAlign: 'center' }}>
-              <h2>Status du PFEJAMEL: {message}</h2>
+              <h2>Status du robot/forward: {message}</h2>
             </div>
           </div>
         </div>
@@ -198,7 +198,8 @@ function AppLogin({ loggedIn, onLogin }) {
         <div id="login" className="block loginBlock">
           <div className="container-fluid">
             <div className="titleHolder">
-              <h2>Connexion</h2>
+              <h2>Connexion à l'application Robot</h2>
+              <p>Veuillez vous connecter pour accéder aux contrôles du robot.</p>
             </div>
             <Form
               form={form}
