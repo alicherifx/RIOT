@@ -91,7 +91,7 @@ function AppLogin({ loggedIn, onLogin }) {
   const handleClick2 = () => {
     if (client) {
       client.publish('PFEJAMEL', '2');
-      console.log('Message sent to PFEJAMEL: 2');
+      console.log('Message sent to PFEJAMEL : 2');
     }
   };
 
