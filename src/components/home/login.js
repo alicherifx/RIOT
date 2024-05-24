@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Form, Input, Button } from 'antd';
 import { CaretUpOutlined, CaretDownOutlined, CaretLeftOutlined, CaretRightOutlined } from '@ant-design/icons';
+import mqtt from 'mqtt';
 
 function AppLogin({ loggedIn, onLogin }) {
   const videoRef = useRef(null);
   const [stream, setStream] = useState(null);
   const [cameraOn, setCameraOn] = useState(false);
   const [form] = Form.useForm();
+  const [client, setClient] = useState(null);
+  const [message, setMessage] = useState('');
 
   const toggleCamera = () => {
     if (stream) {
@@ -55,6 +58,43 @@ function AppLogin({ loggedIn, onLogin }) {
     };
   }, [loggedIn]);
 
+  useEffect(() => {
+    if (loggedIn && !client) {
+      const mqttClient = mqtt.connect('wss://test.mosquitto.org:8081');
+      mqttClient.on('connect', () => {
+        console.log('Connected to MQTT broker');
+        mqttClient.subscribe('PFEJAMEL', (err) => {
+          if (!err) {
+            console.log('Subscribed to PFEJAMEL');
+          }
+        });
+      });
+      mqttClient.on('message', (topic, payload) => {
+        if (topic === 'PFEJAMEL') {
+          setMessage(payload.toString());
+        }
+      });
+      mqttClient.on('error', (error) => {
+        console.error('MQTT connection error:', error);
+      });
+      setClient(mqttClient);
+    }
+  }, [loggedIn, client]);
+
+  const handleClick1 = () => {
+    if (client) {
+      client.publish('robot/forward', '1');
+      console.log('Message sent to PFEJAMEL: 1');
+    }
+  };
+
+  const handleClick2 = () => {
+    if (client) {
+      client.publish('PFEJAMEL', '2');
+      console.log('Message sent to PFEJAMEL: 2');
+    }
+  };
+
   return (
     <div>
       {loggedIn ? (
@@ -63,7 +103,12 @@ function AppLogin({ loggedIn, onLogin }) {
             <div className="control-section" style={{ borderBottom: '1px solid #ccc', marginBottom: '16px', paddingBottom: '16px', flex: '2' }}>
               <h1 style={{ textAlign: 'center', fontSize: '1.5em', marginBottom: '16px' }}>Control des mouvements</h1>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
-                <Button type="primary" icon={<CaretUpOutlined />} style={{ width: '100px', marginRight: '8px', background: 'blue' }} />
+                <Button
+                  type="primary"
+                  icon={<CaretUpOutlined />}
+                  style={{ width: '100px', marginRight: '8px', background: 'blue' }}
+                  onClick={handleClick1}
+                />
               </div>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
                 <Button type="primary" icon={<CaretLeftOutlined />} style={{ width: '100px', marginRight: '4px', background: 'blue' }} />
@@ -77,7 +122,7 @@ function AppLogin({ loggedIn, onLogin }) {
             <div className="control-section" style={{ flex: '2', display: 'flex', flexDirection: 'column' }}>
               <h1 style={{ textAlign: 'center', fontSize: '1.5em', marginBottom: '16px' }}>Control de la tête du robot</h1>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
-                <Button type="primary" icon={<CaretUpOutlined />} style={{ width: '100px', marginRight: '8px', background: 'red' }} />
+                <Button type="primary" icon={<CaretUpOutlined />} style={{ width: '100px', marginRight: '8px', background: 'red' }} onClick={handleClick2} />
               </div>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
                 <Button type="primary" icon={<CaretLeftOutlined />} style={{ width: '100px', marginRight: '4px', background: 'red' }} />
@@ -100,6 +145,9 @@ function AppLogin({ loggedIn, onLogin }) {
             <h1 style={{ textAlign: 'center', fontSize: '1.5em' }}>Diffusion en direct</h1>
             <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
               <video autoPlay playsInline style={{ width: '100%', height: '100%' }} ref={videoRef} />
+            </div>
+            <div style={{ marginTop: '16px', textAlign: 'center' }}>
+              <h2>Status du PFEJAMEL: {message}</h2>
             </div>
           </div>
         </div>
