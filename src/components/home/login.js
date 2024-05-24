@@ -63,9 +63,9 @@ function AppLogin({ loggedIn, onLogin }) {
       const mqttClient = mqtt.connect('wss://test.mosquitto.org:8081');
       mqttClient.on('connect', () => {
         console.log('Connected to MQTT broker');
-        mqttClient.subscribe('PFEJAMEL', (err) => {
+        mqttClient.subscribe('robot/forward', (err) => {
           if (!err) {
-            console.log('Subscribed to PFEJAMEL');
+            console.log('Subscribed to robot/forward');
           }
         });
       });
@@ -81,17 +81,17 @@ function AppLogin({ loggedIn, onLogin }) {
     }
   }, [loggedIn, client]);
 
-  const handleClick1 = () => {
+  const handleMouseDown = (topic) => {
     if (client) {
-      client.publish('robot/forward', '1');
-      console.log('Message sent to PFEJAMEL: 1');
+      client.publish(topic, '1');
+      console.log(`Message sent to ${topic}: 1`);
     }
   };
 
-  const handleClick2 = () => {
+  const handleMouseUp = (topic) => {
     if (client) {
-      client.publish('PFEJAMEL', '2');
-      console.log('Message sent to PFEJAMEL : 2');
+      client.publish(topic, '0');
+      console.log(`Message sent to ${topic}: 0`);
     }
   };
 
@@ -107,30 +107,73 @@ function AppLogin({ loggedIn, onLogin }) {
                   type="primary"
                   icon={<CaretUpOutlined />}
                   style={{ width: '100px', marginRight: '8px', background: 'blue' }}
-                  onClick={handleClick1}
+                  onMouseDown={() => handleMouseDown('robot/forward')}
+                  onMouseUp={() => handleMouseUp('robot/forward')}
                 />
               </div>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
-                <Button type="primary" icon={<CaretLeftOutlined />} style={{ width: '100px', marginRight: '4px', background: 'blue' }} />
+                <Button
+                  type="primary"
+                  icon={<CaretLeftOutlined />}
+                  style={{ width: '100px', marginRight: '4px', background: 'blue' }}
+                  onMouseDown={() => handleMouseDown('robot/left')}
+                  onMouseUp={() => handleMouseUp('robot/left')}
+                />
                 <Button type="primary" style={{ width: '100px', background: 'blue' }}>Stop</Button>
-                <Button type="primary" icon={<CaretRightOutlined />} style={{ width: '100px', marginLeft: '4px', background: 'blue' }} />
+                <Button
+                  type="primary"
+                  icon={<CaretRightOutlined />}
+                  style={{ width: '100px', marginLeft: '4px', background: 'blue' }}
+                  onMouseDown={() => handleMouseDown('robot/right')}
+                  onMouseUp={() => handleMouseUp('robot/right')}
+                />
               </div>
               <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <Button type="primary" icon={<CaretDownOutlined />} style={{ width: '100px', marginTop: '8px', background: 'blue' }} />
+                <Button
+                  type="primary"
+                  icon={<CaretDownOutlined />}
+                  style={{ width: '100px', marginTop: '8px', background: 'blue' }}
+                  onMouseDown={() => handleMouseDown('robot/backward')}
+                  onMouseUp={() => handleMouseUp('robot/backward')}
+                />
               </div>
             </div>
             <div className="control-section" style={{ flex: '2', display: 'flex', flexDirection: 'column' }}>
               <h1 style={{ textAlign: 'center', fontSize: '1.5em', marginBottom: '16px' }}>Control de la tête du robot</h1>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
-                <Button type="primary" icon={<CaretUpOutlined />} style={{ width: '100px', marginRight: '8px', background: 'red' }} onClick={handleClick2} />
+                <Button
+                  type="primary"
+                  icon={<CaretUpOutlined />}
+                  style={{ width: '100px', marginRight: '8px', background: 'red' }}
+                  onMouseDown={() => handleMouseDown('robot/head/up')}
+                  onMouseUp={() => handleMouseUp('robot/head/up')}
+                />
               </div>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
-                <Button type="primary" icon={<CaretLeftOutlined />} style={{ width: '100px', marginRight: '4px', background: 'red' }} />
+                <Button
+                  type="primary"
+                  icon={<CaretLeftOutlined />}
+                  style={{ width: '100px', marginRight: '4px', background: 'red' }}
+                  onMouseDown={() => handleMouseDown('robot/head/left')}
+                  onMouseUp={() => handleMouseUp('robot/head/left')}
+                />
                 <Button type="primary" style={{ width: '100px', background: 'red' }}>Stop</Button>
-                <Button type="primary" icon={<CaretRightOutlined />} style={{ width: '100px', marginLeft: '4px', background: 'red' }} />
+                <Button
+                  type="primary"
+                  icon={<CaretRightOutlined />}
+                  style={{ width: '100px', marginLeft: '4px', background: 'red' }}
+                  onMouseDown={() => handleMouseDown('robot/head/right')}
+                  onMouseUp={() => handleMouseUp('robot/head/right')}
+                />
               </div>
               <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <Button type="primary" icon={<CaretDownOutlined />} style={{ width: '100px', marginTop: '8px', background: 'red' }} />
+                <Button
+                  type="primary"
+                  icon={<CaretDownOutlined />}
+                  style={{ width: '100px', marginTop: '8px', background: 'red' }}
+                  onMouseDown={() => handleMouseDown('robot/head/down')}
+                  onMouseUp={() => handleMouseUp('robot/head/down')}
+                />
               </div>
             </div>
             <div style={{ flex: '1', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'center' }}>
