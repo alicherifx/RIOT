@@ -46,7 +46,7 @@ function AppLogin({ loggedIn, onLogin }) {
   const onFinish = (values) => {
     onLogin(values);
   };
-  let hlsPlayer; // Declare hlsPlayer outside the hook
+  let hlsPlayer; // Declare hlsPlayer outside the hook 
   useEffect(() => {
     if (loggedIn) {
       const hlsPlayer = new Hls();
