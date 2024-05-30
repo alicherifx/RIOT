@@ -2,10 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Form, Input, Button } from 'antd';
 import { CaretUpOutlined, CaretDownOutlined, CaretLeftOutlined, CaretRightOutlined } from '@ant-design/icons';
 import mqtt from 'mqtt';
+import ReactPlayer from 'react-player'; // Import for video playback
+import Hls from 'hls.js'; // Import hls.js
 
 function AppLogin({ loggedIn, onLogin }) {
   const videoRef = useRef(null);
-  const [stream, setStream] = useState(null);
+  const [cameraUrl, setCameraUrl] = useState('http://192.168.188.164:8001/stream.mjpg'); // Adjust if needed
+  const [stream, setStream] = useState(null); // Removed - not used for IP camera
   const [cameraOn, setCameraOn] = useState(false);
   const [form] = Form.useForm();
   const [client, setClient] = useState(null);
@@ -43,20 +46,28 @@ function AppLogin({ loggedIn, onLogin }) {
   const onFinish = (values) => {
     onLogin(values);
   };
-
+  let hlsPlayer; // Declare hlsPlayer outside the hook
   useEffect(() => {
     if (loggedIn) {
-      startCamera();
-    } else {
-      stopCamera();
+      const hlsPlayer = new Hls();
+      hlsPlayer.attachMedia(videoRef.current);
+      hlsPlayer.loadSource(cameraUrl);
+      hlsPlayer.on(Hls.Events.MEDIA_ATTACHED, () => {
+        console.log('Media attached');
+        hlsPlayer.load();
+      });
+
+    } if (!loggedIn && hlsPlayer) {
+      hlsPlayer.destroy();
+      hlsPlayer = null;
     }
 
     return () => {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+      if (hlsPlayer) {
+        hlsPlayer.destroy();
       }
     };
-  }, [loggedIn]);
+  }, [loggedIn, cameraUrl]);
 
   useEffect(() => {
     if (loggedIn && !client) {
@@ -185,10 +196,10 @@ function AppLogin({ loggedIn, onLogin }) {
             </div>
           </div>
           <div className="video-container" style={{ flex: '3', height: '100%', border: '1px solid #ccc', padding: '16px', marginLeft: '16px' }}>
-            <h1 style={{ textAlign: 'center', fontSize: '1.5em' }}>Diffusion en direct</h1>
-            <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-              <video autoPlay playsInline style={{ width: '100%', height: '100%' }} ref={videoRef} />
-            </div>
+  <h1 style={{ textAlign: 'center', fontSize: '1.5em' }}>Diffusion en direct</h1>
+  <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
+  <img src={cameraUrl} alt="MJPEG Stream" style={{ width: '100%', height: '100%' }} />
+    </div>
             <div style={{ marginTop: '16px', textAlign: 'center' }}>
               <h2>Status du robot/forward: {message}</h2>
             </div>
