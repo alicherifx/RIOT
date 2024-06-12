@@ -6,7 +6,7 @@ import throttle from 'lodash.throttle';
 
 function AppLogin({ loggedIn, onLogin }) {
   const videoRef = useRef(null);
-  const [cameraUrl, setCameraUrl] = useState('http://192.168.43.164:8001/stream.mjpg');
+  const [cameraUrl, setCameraUrl] = useState('');
   const [stream, setStream] = useState(null);
   const [cameraOn, setCameraOn] = useState(false);
   const [form] = Form.useForm();
@@ -25,8 +25,14 @@ function AppLogin({ loggedIn, onLogin }) {
       const mqttClient = mqtt.connect('wss://test.mosquitto.org:8081');
       mqttClient.on('connect', () => {
         console.log('Connected to MQTT broker');
+        mqttClient.subscribe('robot/ipadress');
+        mqttClient.publish('robot/getip', ''); // Request the IP address
       });
       mqttClient.on('message', (topic, payload) => {
+        if (topic === 'robot/ipadress') {
+          const ipAddress = payload.toString();
+          setCameraUrl(`http://${ipAddress}:8001/stream.mjpg`);
+        }
         if (topic === 'robot/forward') {
           setMessage(payload.toString());
         }
@@ -59,7 +65,7 @@ function AppLogin({ loggedIn, onLogin }) {
         }
         console.log(`Message sent to ${topic}: ${direction} = 1`);
       }
-    }, 200), // Adjust the throttle interval as needed
+    }), // Adjust the throttle interval as needed
     [client]
   );
 
@@ -84,7 +90,7 @@ function AppLogin({ loggedIn, onLogin }) {
         }
         console.log(`Message sent to ${topic}: ${direction}`);
       }
-    }, 200), // Adjust the throttle interval as needed
+    }), // Adjust the throttle interval as needed
     [client]
   );
 
@@ -214,7 +220,11 @@ function AppLogin({ loggedIn, onLogin }) {
           <div className="video-container" style={{ flex: '3', height: '100%', border: '1px solid #ccc', padding: '16px', marginLeft: '16px' }}>
             <h1 style={{ textAlign: 'center', fontSize: '1.5em' }}>Diffusion en direct</h1>
             <div style={{ width: '100%', height: 'calc(100% - 32px)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <img src={cameraUrl} alt="Live Stream" style={{ maxWidth: '100%', maxHeight: '100%' }} />
+              {cameraUrl ? (
+                <img src={cameraUrl} alt="Live Stream" style={{ maxWidth: '100%', maxHeight: '100%' }} />
+              ) : (
+                <div>Loading camera stream...</div>
+              )}
             </div>
           </div>
         </div>
