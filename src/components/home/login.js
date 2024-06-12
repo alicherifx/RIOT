@@ -90,7 +90,7 @@ function AppLogin({ loggedIn, onLogin }) {
         }
         console.log(`Message sent to ${topic}: ${direction}`);
       }
-    }), // Adjust the throttle interval as needed
+    }, 200 ), // Adjust the throttle interval as needed
     [client]
   );
 
